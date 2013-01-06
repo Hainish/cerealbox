@@ -3,6 +3,9 @@ cerealbox
 Created by Steve Ocepek
 Copyright (C) 2011 Trustwave Holdings, Inc.
 
+Modified by William Budington
+Copyright (c) 2013
+
 Contains portions from ColorduinoPlasma
 ColorduinoPlasma - Plasma demo using Colorduino Library for Arduino
 Copyright (c) 2011 Sam C. Lin lincomatic@hotmail.com ALL RIGHTS RESERVED
@@ -28,7 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <Colorduino.h>
-#define CMD_BUFFER 32
+#define CMD_BUFFER 35
 #define ARRAY_SIZE 128
 #define OVERLOAD 90
 #define smillis() ((long)millis())
@@ -313,7 +316,7 @@ void loop() {
     //End of command - CR or LF
     //CR+LF is ok, it'll just cause double flush
     if (buf == 10 || buf == 13) {
-      if (i == 31) {
+      if (i == 34) {
         // Add null
         cmd[i+1] = 0;
         
@@ -348,20 +351,8 @@ void loop() {
             if (cmd[0] == 49) {
               //Stop adding if at limit
               if (pos < ARRAY_SIZE) {
-                //Create color from country code
-                randomSeed(cmd[30]);
-                int r = random(256);
-                randomSeed(cmd[29]);
-                int g = random(256);
-                randomSeed(g);
-                int b = random(256);
-            
-                //Add to array
-                led[pos][0] = r;
-                led[pos][1] = g;
-                led[pos][2] = b;
-              
-                //pos 3-6 are ip
+
+                // led pos 3-6 are ip
                 led[pos][3] = tohex(cmd[15])*16 + tohex(cmd[16]);
                 led[pos][4] = tohex(cmd[17])*16 + tohex(cmd[18]);
                 led[pos][5] = tohex(cmd[19])*16 + tohex(cmd[20]);
@@ -371,6 +362,56 @@ void loop() {
                 led[pos][7] = tohex(cmd[24])*16 + tohex(cmd[25]);
                 led[pos][8] = tohex(cmd[26])*16 + tohex(cmd[27]);
 
+
+                //Create color from continent code
+                int r, g, b;
+                if(led[pos][3] == 50 &&
+                   led[pos][4] == 116 &&
+                   led[pos][5] == 8 &&
+                   led[pos][6] == -18){ // 50.116.8.238 ioio is red
+                  r = 55;
+                  g = 0;
+                  b = 0;
+                } else if(cmd[32] == 69 && cmd[33] == 85){  // EU is blue
+                  r = 0;
+                  g = 0;
+                  b = 55;
+                } else if(cmd[32] == 65 && cmd[33] == 83) { // AS is orange
+                  r = 200;
+                  g = 50;
+                  b = 0;
+                } else if(cmd[32] == 79 && cmd[33] == 67){ // OC is purple
+                  r = 55;
+                  g = 0;
+                  b = 55;
+                } else if(cmd[32] == 65 && cmd[33] == 70){ // AF is yellow
+                  r = 90;
+                  g = 55;
+                  b = 0;
+                } else if(cmd[32] == 83 && cmd[33] == 65){ // SA is white
+                  r = 255;
+                  g = 255;
+                  b = 255;
+                } else if(cmd[32] == 78 && cmd[33] == 65){ // NA is cyan
+                  if(cmd[29] == 85 && cmd[30] == 83){ // US is green
+                    r = 0;
+                    g = 55;
+                    b = 0;
+                  } else {
+                    r = 0;
+                    g = 200;
+                    b = 55;
+                  }
+                } else if(cmd[32] == 45 && cmd[33] == 45){ // -- (local) is pink
+                  r = 55;
+                  g = 20;
+                  b = 20;
+                }            
+                //Add to array
+                led[pos][0] = r;
+                led[pos][1] = g;
+                led[pos][2] = b;
+              
                 pos++;
                 flush_buffer();
                 numcmd++;
@@ -415,8 +456,8 @@ void loop() {
     }
     
     //Otherwise we're still reading data
-    //A-Z, 0-9, and comma
-    else if ((buf >= 48 && buf <= 57) || (buf >= 65 && buf <= 90) || (buf == 44)) {
+    //A-Z, 0-9, and comma, and dash
+    else if ((buf >= 48 && buf <= 57) || (buf >= 65 && buf <= 90) || (buf == 44) || (buf == 45)) {
       cmd[i] = buf;
       i++;
     }
@@ -425,4 +466,3 @@ void loop() {
     }
   }
 }
-

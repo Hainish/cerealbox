@@ -5,6 +5,9 @@ class SSLSocketWrapper():
     self.bindsocket = socket.socket()
     self.bindsocket.bind(('localhost', port))
 
+  def set_message_handler(self, message_handler):
+    self.message_handler = message_handler
+
   def listen(self):
     self.bindsocket.listen(0)
     while True:
@@ -17,6 +20,7 @@ class SSLSocketWrapper():
       try:
         data = connstream.read()
         while data:
+          self.message_handler(data)
           data = connstream.read()
       except ssl.SSLError, e:
         pass

@@ -31,6 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <Colorduino.h>
+#include "Config.h"
 #define CMD_BUFFER 35
 #define ARRAY_SIZE 128
 #define OVERLOAD 90
@@ -362,13 +363,23 @@ void loop() {
                 led[pos][7] = tohex(cmd[24])*16 + tohex(cmd[25]);
                 led[pos][8] = tohex(cmd[26])*16 + tohex(cmd[27]);
 
+                // determine if this is in our special_ips array
+                bool special_ip = false;
+                for(int x = 0; x < sizeof(special_ips) / 4; x++){
+                  int matches = 0;
+                  for(int y = 0; y < 4; y++){
+                    if(led[pos][y+3] == (special_ips[x][y] > 127 ? special_ips[x][y] - 256 : special_ips[x][y])){
+                      matches++;
+                    }
+                  }
+                  if(matches == 4){
+                    special_ip = true;
+                  }
+                }
 
                 //Create color from continent code
                 int r, g, b;
-                if(led[pos][3] == 50 &&
-                   led[pos][4] == 116 &&
-                   led[pos][5] == 8 &&
-                   led[pos][6] == -18){ // 50.116.8.238 ioio is red
+                if(special_ip){ // special_ips are red
                   r = 55;
                   g = 0;
                   b = 0;

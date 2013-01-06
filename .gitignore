@@ -1,3 +1,4 @@
 *.swp
 arduino/build-cli/*
-Config.mk
+arduino/Config.mk
+arduino/Config.h

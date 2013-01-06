@@ -1,0 +1,3 @@
+*.swp
+arduino/build-cli/*
+Config.mk

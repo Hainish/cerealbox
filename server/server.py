@@ -2,23 +2,38 @@ import sys
 from serial_comm import SerialComm
 from ssl_socket_wrapper import SSLSocketWrapper
 
-comm = None
-
-def usage():
-  print "Usage: python ./server.py [port] [serial_device]"
-
-def message_handler(message):
-  comm.writeln(message)
-
-def disconnect_handler():
-  comm.close()
-
 if len(sys.argv) != 3:
-  usage()
+  Server.usage()
   sys.exit()
-else:
-  comm = SerialComm(sys.argv[2])
-  socket = SSLSocketWrapper(int(sys.argv[1]))
-  socket.set_message_handler(message_handler)
-  socket.set_disconnect_handler(disconnect_handler)
-  socket.listen()
+
+class Server():
+  comm = None
+
+  @staticmethod
+  def usage(self):
+    print "Usage: python ./server.py [port] [serial_device]"
+
+  def __init__(self, port, serial_device):
+    self.port = port
+    self.serial_device = serial_device
+
+  def message_handler(self, message):
+    self.comm.writeln(message)
+
+  def disconnect_handler(self, addr):
+    print "Disconnect from "+addr
+    self.comm.close()
+
+  def connect_handler(self, addr):
+    print "New connection from "+addr
+    self.comm = SerialComm(self.serial_device)
+
+  def start(self):
+    socket = SSLSocketWrapper(int(self.port))
+    socket.set_message_handler(self.message_handler)
+    socket.set_connect_handler(self.connect_handler)
+    socket.set_disconnect_handler(self.disconnect_handler)
+    socket.listen()
+
+s = Server(sys.argv[1], sys.argv[2])
+s.start()

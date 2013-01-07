@@ -16,10 +16,14 @@ class SSLSocketWrapper():
   def set_disconnect_handler(self, disconnect_handler):
     self.disconnect_handler = disconnect_handler
 
+  def set_connect_handler(self, connect_handler):
+    self.connect_handler = connect_handler
+
   def listen(self):
     self.bindsocket.listen(0)
     while True:
       newsocket, fromaddr = self.bindsocket.accept()
+      self.connect_handler(fromaddr[0])
       connstream = ssl.wrap_socket(newsocket,
         server_side=True,
         certfile="./ssl/server.crt",
@@ -35,4 +39,7 @@ class SSLSocketWrapper():
       finally:
         connstream.shutdown(socket.SHUT_RDWR)
         connstream.close()
-        self.disconnect_handler()
+        self.disconnect_handler(fromaddr[0])
+
+  def close(self):
+    self.bindsocket.close()

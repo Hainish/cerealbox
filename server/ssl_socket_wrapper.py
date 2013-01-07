@@ -1,4 +1,4 @@
-import socket, ssl
+import socket, ssl, sys
 
 def placeholder():
   pass
@@ -7,7 +7,14 @@ class SSLSocketWrapper():
   def __init__(self, port):
     self.bindsocket = socket.socket()
     self.bindsocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    self.bindsocket.bind(('localhost', port))
+    try:
+      self.bindsocket.bind(('localhost', port))
+    except socket.error, e:
+      if e.errno == 98:
+        print "Specified port is already in use: "+str(port)
+      else:
+        print e
+      sys.exit()
     self.message_handler = placeholder
     self.disconnect_handler = placeholder
 

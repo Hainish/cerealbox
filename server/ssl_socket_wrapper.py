@@ -8,7 +8,7 @@ class SSLSocketWrapper():
     self.bindsocket = socket.socket()
     self.bindsocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     try:
-      self.bindsocket.bind(('localhost', port))
+      self.bindsocket.bind(('', port))
     except socket.error, e:
       if e.errno == 98:
         print "Specified port is already in use: "+str(port)

@@ -23,12 +23,13 @@ class Server():
   def disconnect_handler(self, addr):
     print "Disconnect from "+addr
     self.comm.close()
+    self.comm = SerialComm(self.serial_device)
 
   def connect_handler(self, addr):
     print "New connection from "+addr
-    self.comm = SerialComm(self.serial_device)
 
   def start(self):
+    self.comm = SerialComm(self.serial_device)
     socket = SSLSocketWrapper(int(self.port))
     socket.set_message_handler(self.message_handler)
     socket.set_connect_handler(self.connect_handler)

@@ -6,6 +6,7 @@ def placeholder():
 class SSLSocketWrapper():
   def __init__(self, port):
     self.bindsocket = socket.socket()
+    self.bindsocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     self.bindsocket.bind(('localhost', port))
     self.message_handler = placeholder
     self.disconnect_handler = placeholder
@@ -40,6 +41,3 @@ class SSLSocketWrapper():
         connstream.shutdown(socket.SHUT_RDWR)
         connstream.close()
         self.disconnect_handler(fromaddr[0])
-
-  def close(self):
-    self.bindsocket.close()

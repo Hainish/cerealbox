@@ -1,4 +1,4 @@
-import socket, ssl, sys, config
+import socket, ssl, sys
 
 def placeholder():
   pass
@@ -27,7 +27,7 @@ class SSLSocketWrapper():
   def set_connect_handler(self, connect_handler):
     self.connect_handler = connect_handler
 
-  def listen(self):
+  def start(self, password):
     self.bindsocket.listen(0)
     while True:
       newsocket, fromaddr = self.bindsocket.accept()
@@ -45,7 +45,7 @@ class SSLSocketWrapper():
       else:
         try:
           data = connstream.read()
-          if data.strip() != config.server_password:
+          if data.strip() != password:
             print "Authentication Unsuccessful!"
           else:
             while data:

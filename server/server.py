@@ -2,20 +2,17 @@ import sys
 from serial_comm import SerialComm
 from ssl_socket_wrapper import SSLSocketWrapper
 
-if len(sys.argv) != 3:
-  Server.usage()
-  sys.exit()
-
 class Server():
   comm = None
 
   @staticmethod
-  def usage(self):
-    print "Usage: python ./server.py [port] [serial_device]"
+  def usage():
+    print "Usage: python ./server.py [port] [serial_device] [password]"
 
-  def __init__(self, port, serial_device):
+  def __init__(self, port, serial_device, password):
     self.port = int(port)
     self.serial_device = serial_device
+    self.password = password
 
   def message_handler(self, message):
     self.comm.writeln(message)
@@ -36,7 +33,11 @@ class Server():
     socket.set_disconnect_handler(self.disconnect_handler)
 
     print "Listening on port "+str(self.port)
-    socket.listen()
+    socket.start(self.password)
 
-s = Server(sys.argv[1], sys.argv[2])
+if len(sys.argv) != 4:
+  Server.usage()
+  sys.exit()
+
+s = Server(sys.argv[1], sys.argv[2], sys.argv[3])
 s.start()

@@ -3,7 +3,6 @@ from serial_comm import SerialComm
 from ssl_socket_wrapper import SSLSocketWrapper
 
 class Server():
-  comm = None
 
   @staticmethod
   def usage():

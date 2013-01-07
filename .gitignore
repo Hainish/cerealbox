@@ -4,3 +4,4 @@ arduino/build-cli/*
 arduino/Config.mk
 arduino/Config.h
 server/ssl/*
+server/config.py

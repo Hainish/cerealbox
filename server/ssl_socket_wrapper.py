@@ -1,4 +1,4 @@
-import socket, ssl, sys
+import socket, ssl, sys, config
 
 def placeholder():
   pass
@@ -37,8 +37,6 @@ class SSLSocketWrapper():
           server_side=True,
           certfile="./ssl/server.crt",
           keyfile="./ssl/server.key",
-          cert_reqs=ssl.CERT_REQUIRED,
-          ca_certs="./ssl/certs.pem",
           ssl_version=ssl.PROTOCOL_TLSv1)
         self.connect_handler(fromaddr[0])
       except ssl.SSLError, e:
@@ -47,9 +45,12 @@ class SSLSocketWrapper():
       else:
         try:
           data = connstream.read()
-          while data:
-            self.message_handler(data)
-            data = connstream.read()
+          if data.strip() != config.server_password:
+            print "Authentication Unsuccessful!"
+          else:
+            while data:
+              self.message_handler(data)
+              data = connstream.read()
         finally:
           connstream.shutdown(socket.SHUT_RDWR)
           connstream.close()

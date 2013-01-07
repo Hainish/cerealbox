@@ -18,7 +18,7 @@ class SSLSocketWrapper():
   def set_connect_handler(self, connect_handler):
     self.connect_handler = connect_handler
 
-  def start(self, port, password):
+  def _listen(self, port):
     self.bindsocket = socket.socket()
     self.bindsocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     try:
@@ -31,9 +31,9 @@ class SSLSocketWrapper():
       sys.exit()
 
     print "Listening on port "+str(port)
-
     self.bindsocket.listen(0)
 
+  def _serve_connections(self, password):
     while True:
       newsocket, fromaddr = self.bindsocket.accept()
       connstream = None
@@ -61,3 +61,7 @@ class SSLSocketWrapper():
           connstream.shutdown(socket.SHUT_RDWR)
           connstream.close()
           self.disconnect_handler(fromaddr[0])
+
+  def start(self, port, password):
+    self._listen(port)
+    self._serve_connections(password)

@@ -15,6 +15,7 @@ class Server():
 
   def message_handler(self, message):
     self.comm.writeln(message)
+    print "Got message: "+message
 
   def disconnect_handler(self, addr):
     print "Disconnect from "+addr
@@ -26,13 +27,11 @@ class Server():
 
   def start(self):
     self.comm = SerialComm(self.serial_device)
-    socket = SSLSocketWrapper(self.port)
+    socket = SSLSocketWrapper()
     socket.set_message_handler(self.message_handler)
     socket.set_connect_handler(self.connect_handler)
     socket.set_disconnect_handler(self.disconnect_handler)
-
-    print "Listening on port "+str(self.port)
-    socket.start(self.password)
+    socket.start(self.port, self.password)
 
 if len(sys.argv) != 4:
   Server.usage()

@@ -4,19 +4,10 @@ def placeholder():
   pass
 
 class SSLSocketWrapper():
-  def __init__(self, port):
-    self.bindsocket = socket.socket()
-    self.bindsocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    try:
-      self.bindsocket.bind(('', port))
-    except socket.error, e:
-      if e.errno == 98:
-        print "Specified port is already in use: "+str(port)
-      else:
-        print e
-      sys.exit()
+  def __init__(self):
     self.message_handler = placeholder
     self.disconnect_handler = placeholder
+    self.connect_handler = placeholder
 
   def set_message_handler(self, message_handler):
     self.message_handler = message_handler
@@ -27,8 +18,22 @@ class SSLSocketWrapper():
   def set_connect_handler(self, connect_handler):
     self.connect_handler = connect_handler
 
-  def start(self, password):
+  def start(self, port, password):
+    self.bindsocket = socket.socket()
+    self.bindsocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    try:
+      self.bindsocket.bind(('', port))
+    except socket.error, e:
+      if e.errno == 98:
+        print "Specified port is already in use: "+str(port)
+      else:
+        print e
+      sys.exit()
+
+    print "Listening on port "+str(port)
+
     self.bindsocket.listen(0)
+
     while True:
       newsocket, fromaddr = self.bindsocket.accept()
       connstream = None
@@ -44,10 +49,11 @@ class SSLSocketWrapper():
         pass
       else:
         try:
-          data = connstream.read()
-          if data.strip() != password:
+          read_pw = connstream.read()
+          if read_pw.strip() != password:
             print "Authentication Unsuccessful!"
           else:
+            data = connstream.read()
             while data:
               self.message_handler(data)
               data = connstream.read()

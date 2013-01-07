@@ -14,7 +14,7 @@ class Server():
     print "Usage: python ./server.py [port] [serial_device]"
 
   def __init__(self, port, serial_device):
-    self.port = port
+    self.port = int(port)
     self.serial_device = serial_device
 
   def message_handler(self, message):
@@ -30,10 +30,12 @@ class Server():
 
   def start(self):
     self.comm = SerialComm(self.serial_device)
-    socket = SSLSocketWrapper(int(self.port))
+    socket = SSLSocketWrapper(self.port)
     socket.set_message_handler(self.message_handler)
     socket.set_connect_handler(self.connect_handler)
     socket.set_disconnect_handler(self.disconnect_handler)
+
+    print "Listening on port "+str(self.port)
     socket.listen()
 
 s = Server(sys.argv[1], sys.argv[2])

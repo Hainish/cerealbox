@@ -1,12 +1,13 @@
 import sys
 import inspect
 from ssl_client_wrapper import SSLClientWrapper
+from sniffer import Sniffer
 
 class Client():
 
   @staticmethod
   def usage():
-    print "Usage: python ./client.py [host] [port] [net_device] [src_ipaddr] [password]"
+    print "Usage: python ./client.py HOST PORT NET_DEVICE SRC_IPADDR PASSWORD"
 
   def __init__(self, host, port, net_device, src_ipaddr, password):
     self.host = host

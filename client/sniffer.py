@@ -164,10 +164,15 @@ class Sniffer():
   @staticmethod
   def ip_to_hex(ip):
     ip_s = ip.split(".")
-    hex = "%02x%02x%02x%02x" % (int(ip_s[0]),int(ip_s[1]),int(ip_s[2]),int(ip_s[3]))
+    hex = "%02X%02X%02X%02X" % (int(ip_s[0]),int(ip_s[1]),int(ip_s[2]),int(ip_s[3]))
     return hex
 
   @staticmethod
   def mac_to_hex(mac):
-    hex = "%02x%02x%02x%02x%02x%02x" % tuple(mac)
+    hex = "%02X%02X%02X%02X%02X%02X" % tuple(mac)
     return hex
+
+  @staticmethod
+  def port_to_hex(port):
+    port = "%04X" % (port)
+    return port

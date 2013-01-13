@@ -22,7 +22,7 @@ class Client():
       str(code),
       Sniffer.mac_to_hex(rmac),
       Sniffer.ip_to_hex(rip),
-      str(rport),
+      Sniffer.port_to_hex(rport),
       cc,
       cont
     ]

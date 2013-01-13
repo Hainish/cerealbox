@@ -2,7 +2,6 @@
 *.pyc
 arduino/build-cli/*
 arduino/Config.mk
-arduino/Config.h
 server/ssl/*
 client/ssl/*
 server/config.py

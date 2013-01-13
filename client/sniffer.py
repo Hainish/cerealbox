@@ -1,5 +1,6 @@
 import pcapy
 import impacket.ImpactDecoder
+from datetime import datetime
 
 SNAPLEN = 90
 PROMISC_MODE = 0
@@ -8,13 +9,16 @@ TO_MS = 15
 class Sniffer():
   def __init__(self):
     self.decoder = impacket.ImpactDecoder.EthDecoder() 
+    self.udp_db = {}
 
 
   def set_new_connection_handler(self, new_connection_handler):
     self.new_connection_handler = new_connection_handler
 
 
-  def sniff(self, net_device, src_ipaddr, dns):
+  def sniff(self, net_device, my_ipaddr, dns):
+    self.my_ipaddr = my_ipaddr
+
     p = None
 
     # create reader object
@@ -26,9 +30,9 @@ class Sniffer():
     # filter based on dns settings
     try:
       if dns:
-        p.setfilter("(tcp or udp) and host "+src_ipaddr)
+        p.setfilter("(tcp or udp) and host "+my_ipaddr)
       else:
-        p.setfilter("(tcp or (udp and not port 53)) and host "+src_ipaddr)
+        p.setfilter("(tcp or (udp and not port 53)) and host "+my_ipaddr)
     except Exception, e:
       print "Could not filter packets. Error: %s" % (str(e))
 
@@ -43,28 +47,56 @@ class Sniffer():
     src_ip = None
     dst_ip = None
     proto_id = None
-    src_port = None
-    dst_port = None
+
+    layer4 = None
+    layer2 = None
 
     # decode packet
     try:
-      p = self.decoder.decode(data)
+      layer2 = self.decoder.decode(data)
     except Exception, e:
       print "Could not decode packet: %s" % (str(e))
     try:
-      src_ip = p.child().get_ip_src()
-      dst_ip = p.child().get_ip_dst()
-      proto_id = p.child().child().protocol
+      src_ip = layer2.child().get_ip_src()
+      dst_ip = layer2.child().get_ip_dst()
+      layer4 = layer2.child().child()
+      proto_id = layer4.protocol
       print "IP SRC: "+str(src_ip)+" ("+self.ip_to_hex(str(src_ip))+") DST: "+str(dst_ip)+" ("+self.ip_to_hex(str(dst_ip))+") PROTO: "+str(proto_id)
     except Exception, e:
       print "Exception parsing packet. Error: %s" % (str(e))
     
+    lport = None
+    rport = None
+    rmac = None
+    rip = None
+
+    #upd or tcp
+    if proto_id == 17 or proto_id == 6:
+      if dst_ip == self.my_ipaddr:
+        rmac = layer2.get_ether_shost()
+        rip = src_ip
+      else:
+        rmac = layer2.get_ether_dhost()
+        rip = dst_ip
+
+    #udp packet
     if proto_id == 17:
-      dst_port = p.child().child().get_uh_dport()
-      src_port = p.child().child().get_uh_sport()
-    if proto_id == 6:
-      dst_port = p.child().child().get_th_dport()
-      src_port = p.child().child().get_th_sport()
+
+      if dst_ip == self.my_ipaddr:
+        lport = layer4.get_uh_dport()
+        rport = layer4.get_uh_sport()
+      else:
+        lport = layer4.get_uh_sport()
+        rport = layer4.get_uh_dport()
+
+      if lport in self.udp_db:
+        self.udp_db[lport]['time'] = datetime.now()
+      else:
+        self.u_open(lport, rmac, rip, rport)
+
+  
+  def u_open(self, lport, rmac, rip, rport):
+    pass
 
       
   def ip_to_hex(self, ip):

@@ -7,13 +7,13 @@ class Client():
 
   @staticmethod
   def usage():
-    print "Usage: python ./client.py HOST PORT NET_DEVICE SRC_IPADDR PASSWORD [DNS]"
+    print "Usage: python ./client.py HOST PORT NET_DEVICE IPADDR PASSWORD [DNS]"
 
-  def __init__(self, host, port, net_device, src_ipaddr, password, dns):
+  def __init__(self, host, port, net_device, my_ipaddr, password, dns):
     self.host = host
     self.port = port
     self.net_device = net_device
-    self.src_ipaddr = src_ipaddr
+    self.my_ipaddr = my_ipaddr
     self.password = password
     self.dns = dns
 
@@ -26,7 +26,7 @@ class Client():
 
     sniffer = Sniffer()
     sniffer.set_new_connection_handler(self.new_connection_handler)
-    sniffer.sniff(self.net_device, self.src_ipaddr, self.dns)
+    sniffer.sniff(self.net_device, self.my_ipaddr, self.dns)
 
 if len(sys.argv) != 6:
   Client.usage()

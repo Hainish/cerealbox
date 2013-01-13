@@ -10,6 +10,7 @@ class Sniffer():
   def __init__(self):
     self.decoder = impacket.ImpactDecoder.EthDecoder() 
     self.udp_db = {}
+    self.tcp_db = {}
 
 
   def set_new_connection_handler(self, new_connection_handler):
@@ -94,8 +95,44 @@ class Sniffer():
       else:
         self.u_open(lport, rmac, rip, rport)
 
+    #tcp packet
+    if proto_id == 6:
+
+      if dst_ip == self.my_ipaddr:
+        lport = layer4.get_th_dport()
+        rport = layer4.get_th_sport()
+      else:
+        lport = layer4.get_th_sport()
+        rport = layer4.get_th_dport()
+
+      fin = layer4.get_FIN()
+      syn = layer4.get_SYN()
+      ack = layer4.get_ACK()
+      rst = layer4.get_RST()
+
+      # if a fin or rst is received, close connection
+      if fin or rst:
+        self.s_close(lport, rmac, rip, rport)
+      # if a syn,ack is received, that's a new connection
+      elif syn and ack:
+        self.s_open(lport, rmac, rip, rport)
+      else:
+        # otherwise, it's mid-stream - update time
+        if lport in self.tcp_db:
+          self.tcp_db[lport]['time'] = datetime.now()
+        else:
+          self.s_open(lport, rmac, rip, rport)
+
   
   def u_open(self, lport, rmac, rip, rport):
+    pass
+
+
+  def s_open(self, lport, rmac, rip, rport):
+    pass
+
+  
+  def s_close(self, lport, rmac, rip, rport):
     pass
 
       

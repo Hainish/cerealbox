@@ -161,7 +161,13 @@ class Sniffer():
         self.tcp_db[lport]['close'] = 1
 
       
-  def ip_to_hex(self, ip):
+  @staticmethod
+  def ip_to_hex(ip):
     ip_s = ip.split(".")
     hex = "%02x%02x%02x%02x" % (int(ip_s[0]),int(ip_s[1]),int(ip_s[2]),int(ip_s[3]))
+    return hex
+
+  @staticmethod
+  def mac_to_hex(mac):
+    hex = "%02x%02x%02x%02x%02x%02x" % tuple(mac)
     return hex

@@ -18,11 +18,19 @@ class Client():
     self.dns = dns
 
   def new_connection_handler(self, code, rmac, rip, rport, cc, cont):
-    pass
+    push_arr = [
+      str(code),
+      Sniffer.mac_to_hex(rmac),
+      Sniffer.ip_to_hex(rip),
+      str(rport),
+      cc,
+      cont
+    ]
+    self.client.writeln(",".join(push_arr))
 
   def start(self):
-    client = SSLClientWrapper()
-    client.start(self.host, self.port, self.password)
+    self.client = SSLClientWrapper()
+    self.client.start(self.host, self.port, self.password)
 
     sniffer = Sniffer()
     sniffer.set_new_connection_handler(self.new_connection_handler)

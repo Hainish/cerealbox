@@ -190,7 +190,7 @@ class Sniffer():
 
   def u_close(self, lport):
     if lport in self.udp_db:
-      numclose += 1
+      self.numclose += 1
       self.new_connection_handler(
           2,
           self.udp_db[lport]['rmac'],

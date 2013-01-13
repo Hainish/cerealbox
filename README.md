@@ -1,4 +1,5 @@
 # Cerealbox
+Arduino-based network monitor, based on the original by Steve Ocepek @ https://github.com/SpiderLabs/cerealbox
 
 ## Requirements
 ### Client & Server

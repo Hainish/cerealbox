@@ -17,7 +17,7 @@ class Client():
     self.password = password
     self.dns = dns
 
-  def new_connection_handler(self, connection):
+  def new_connection_handler(self, code, rmac, rip, rport, cc, cont):
     pass
 
   def start(self):

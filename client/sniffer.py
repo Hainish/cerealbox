@@ -1,5 +1,6 @@
 import pcapy
 import impacket.ImpactDecoder
+import geocode
 from datetime import datetime
 
 SNAPLEN = 90
@@ -11,6 +12,8 @@ class Sniffer():
     self.decoder = impacket.ImpactDecoder.EthDecoder() 
     self.udp_db = {}
     self.tcp_db = {}
+    self.numopen = 0
+    self.numclose = 0
 
 
   def set_new_connection_handler(self, new_connection_handler):
@@ -112,7 +115,7 @@ class Sniffer():
 
       # if a fin or rst is received, close connection
       if fin or rst:
-        self.s_close(lport, rmac, rip, rport)
+        self.s_close(lport)
       # if a syn,ack is received, that's a new connection
       elif syn and ack:
         self.s_open(lport, rmac, rip, rport)
@@ -129,11 +132,33 @@ class Sniffer():
 
 
   def s_open(self, lport, rmac, rip, rport):
-    pass
+    cc, cont = geocode.lookup(rip)
+    self.numopen += 1
+    self.new_connection_handler(1, rmac, rip, rport, cc, cont)
+    self.tcp_db[lport] = {
+        'cc': cc,
+        'cont': cont,
+        'rmac': rmac,
+        'rip': rip,
+        'rport': rport,
+        'close': 0,
+        'time': datetime.now()
+    }
 
   
-  def s_close(self, lport, rmac, rip, rport):
-    pass
+  def s_close(self, lport):
+    if lport in self.tcp_db:
+      if self.tcp_db[lport]['close'] == 0:
+        self.numclose += 1
+        self.new_connection_handler(
+            2,
+            self.tcp_db[lport]['rmac'],
+            self.tcp_db[lport]['rip'],
+            self.tcp_db[lport]['rport'],
+            self.tcp_db[lport]['cc'],
+            self.tcp_db[lport]['cont'],
+        )
+        self.tcp_db[lport]['close'] = 1
 
       
   def ip_to_hex(self, ip):

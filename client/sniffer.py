@@ -50,6 +50,12 @@ class Sniffer():
       src_ip = p.child().get_ip_src()
       dst_ip = p.child().get_ip_dst()
       proto_id = p.child().child().protocol
-      print "IP SRC: "+str(src_ip)+" DST: "+str(dst_ip)+" PROTO: "+str(proto_id)
+      print "IP SRC: "+str(src_ip)+" ("+self.ip_to_hex(str(src_ip))+") DST: "+str(dst_ip)+" ("+self.ip_to_hex(str(dst_ip))+") PROTO: "+str(proto_id)
     except Exception, e:
       print "Exception parsing packet. Error: %s" % (str(e))
+
+
+  def ip_to_hex(self, ip):
+    ip_s = ip.split(".")
+    hex = "%02x%02x%02x%02x" % (int(ip_s[0]),int(ip_s[1]),int(ip_s[2]),int(ip_s[3]))
+    return hex

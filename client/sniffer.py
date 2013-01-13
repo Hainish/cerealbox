@@ -116,14 +116,17 @@ class Sniffer():
       # if a fin or rst is received, close connection
       if fin or rst:
         self.s_close(lport)
-      # if a syn,ack is received, that's a new connection
+      # After we see RST/FIN on a source port, it can only be reopened using SYN+ACK
       elif syn and ack:
         if lport in self.tcp_db:
           if self.tcp_db[lport]['close'] == 1:
             self.s_open(lport, rmac, rip, rport)
-        self.s_open(lport, rmac, rip, rport)
+        else:
+          self.s_open(lport, rmac, rip, rport)
+      # Otherwise see if connection exists and create if it doesn't
+      # Only do this if sport hasn't been used before
       else:
-        # otherwise, it's mid-stream - update time
+        # If connection is open, update time
         if lport in self.tcp_db:
           if self.tcp_db[lport]['close'] == 0:
             self.tcp_db[lport]['time'] = datetime.now()

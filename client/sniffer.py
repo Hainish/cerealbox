@@ -40,6 +40,11 @@ class Sniffer():
 
 
   def packet_received(self, hdr, data):
+    src_ip = None
+    dst_ip = None
+    proto_id = None
+    src_port = None
+    dst_port = None
 
     # decode packet
     try:
@@ -53,8 +58,15 @@ class Sniffer():
       print "IP SRC: "+str(src_ip)+" ("+self.ip_to_hex(str(src_ip))+") DST: "+str(dst_ip)+" ("+self.ip_to_hex(str(dst_ip))+") PROTO: "+str(proto_id)
     except Exception, e:
       print "Exception parsing packet. Error: %s" % (str(e))
+    
+    if proto_id == 17:
+      dst_port = p.child().child().get_uh_dport()
+      src_port = p.child().child().get_uh_sport()
+    if proto_id == 6:
+      dst_port = p.child().child().get_th_dport()
+      src_port = p.child().child().get_th_sport()
 
-
+      
   def ip_to_hex(self, ip):
     ip_s = ip.split(".")
     hex = "%02x%02x%02x%02x" % (int(ip_s[0]),int(ip_s[1]),int(ip_s[2]),int(ip_s[3]))

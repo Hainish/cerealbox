@@ -6,7 +6,7 @@ class Server():
 
   @staticmethod
   def usage():
-    print "Usage: python ./server.py [port] [serial_device] [password]"
+    print "Usage: python ./server.py PORT SERIAL_DEVICE PASSWORD"
 
   def __init__(self, port, serial_device, password):
     self.port = int(port)

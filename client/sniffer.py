@@ -172,11 +172,33 @@ class Sniffer():
 
   
   def u_open(self, lport, rmac, rip, rport):
-    pass
+    cc, cont = geocode.lookup(rip)
+    self.numopen += 1
+    self.new_connection_handler(1, rmac, rip, rport, cc, cont)
+    self.udp_db[lport] = {
+        'cc': cc,
+        'cont': cont,
+        'rmac': rmac,
+        'rip': rip,
+        'rport': rport,
+        'close': 0,
+        'time': datetime.now()
+    }
 
 
   def u_close(self, lport):
-    pass
+    if lport in self.udp_db:
+      numclose += 1
+      self.new_connection_handler(
+          2,
+          self.udp_db[lport]['rmac'],
+          self.udp_db[lport]['rip'],
+          self.udp_db[lport]['rport'],
+          self.udp_db[lport]['cc'],
+          self.udp_db[lport]['cont'],
+      )
+      del self.udp_db[lport]
+
 
 
   def s_open(self, lport, rmac, rip, rport):

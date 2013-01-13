@@ -66,7 +66,7 @@ class Sniffer():
       dst_ip = layer2.child().get_ip_dst()
       layer4 = layer2.child().child()
       proto_id = layer4.protocol
-      print "IP SRC: "+str(src_ip)+" ("+self.ip_to_hex(str(src_ip))+") DST: "+str(dst_ip)+" ("+self.ip_to_hex(str(dst_ip))+") PROTO: "+str(proto_id)
+      #print "IP SRC: "+str(src_ip)+" ("+self.ip_to_hex(str(src_ip))+") DST: "+str(dst_ip)+" ("+self.ip_to_hex(str(dst_ip))+") PROTO: "+str(proto_id)
     except Exception, e:
       print "Exception parsing packet. Error: %s" % (str(e))
     

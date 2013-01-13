@@ -41,7 +41,7 @@ class Client():
     self.sniffer.set_new_connection_handler(self.new_connection_handler)
     self.sniffer.sniff(self.net_device, self.my_ipaddr, self.dns)
 
-if len(sys.argv) != 6:
+if len(sys.argv) != 6 and len(sys.argv) != 7:
   Client.usage()
   sys.exit()
 if not os.geteuid()==0:

@@ -7,9 +7,6 @@ server-cert:
 	echo Self-signing certificate...
 	openssl x509 -req -days 99999 -in server/ssl/server.csr -signkey server/ssl/server.key -out server/ssl/server.crt 2> /dev/null
 	echo
-	echo Your server ssl certificate has been created. Below are the certificate fingerprints.
-	echo Please note these fingerprints, as you will be asked to verify them on the client side.
-	openssl x509 -sha1 -in server/ssl/server.crt -noout -fingerprint
-	openssl x509 -sha256 -in server/ssl/server.crt -noout -fingerprint
+	echo Your server ssl certificate has been created. The next step is to copy the certificate in server/ssl/cerver.crt to the client file client/ssl/cert.crt
 	echo
 .SILENT: server-cert

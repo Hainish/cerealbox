@@ -1,7 +1,17 @@
 # Cerealbox
-Arduino-based network monitor, based on the original by Steve Ocepek @ https://github.com/SpiderLabs/cerealbox
+Arduino-based network monitor, based on the [original](https://github.com/SpiderLabs/cerealbox) by [Steve Ocepek](http://www.spiderlabs.com)
+
+
 
 ## Requirements
+This code should run on any Arduino board with 2k SRAM equipped with Colors Shield, or the all-in-one Colorduino board. Both Colorduino and Colors Shield are available from [iTead Studio](http://iteadstudio.com/). Colorduino does not include a USB port, so novices (like me) should use the Colors Shield + Arduino Uno.
+
+Test/Dev system is: Ardunio Uno, Colors Shield, 8x8 round LED matrix (iTead)
+
+The Colorduino library by Lincomatic is required and can be found [here](http://blog.lincomatic.com/?p=148).
+
+
+
 ### Client & Server
 - python = 2.7.x
 
@@ -14,8 +24,9 @@ Arduino-based network monitor, based on the original by Steve Ocepek @ https://g
 ### Server Python Packages
 - pyserial >= 2.6
 
-### Server (Arduino)
+### Arduino
 - Arduino >= 1
+- Colorduino Lib >= 1.2.4
 
 ## Installation
 

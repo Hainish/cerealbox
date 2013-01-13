@@ -2,6 +2,7 @@ import sys
 import os
 from ssl_client_wrapper import SSLClientWrapper
 from sniffer import Sniffer
+from datetime import datetime
 
 class Client():
 
@@ -26,15 +27,19 @@ class Client():
       cc,
       cont
     ]
-    self.client.writeln(",".join(push_arr))
+    push = ",".join(push_arr)
+    print push
+    self.client.writeln(push)
+    curr = self.sniffer.numopen - self.sniffer.numclose
+    print "close: %s open: %s, current: %s" % (str(self.sniffer.numclose), str(self.sniffer.numopen), str(curr))
 
   def start(self):
     self.client = SSLClientWrapper()
     self.client.start(self.host, self.port, self.password)
 
-    sniffer = Sniffer()
-    sniffer.set_new_connection_handler(self.new_connection_handler)
-    sniffer.sniff(self.net_device, self.my_ipaddr, self.dns)
+    self.sniffer = Sniffer()
+    self.sniffer.set_new_connection_handler(self.new_connection_handler)
+    self.sniffer.sniff(self.net_device, self.my_ipaddr, self.dns)
 
 if len(sys.argv) != 6:
   Client.usage()

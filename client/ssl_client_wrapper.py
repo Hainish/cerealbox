@@ -1,4 +1,4 @@
-import socket, ssl
+import socket, ssl, sys
 
 def placeholder():
   pass
@@ -13,9 +13,15 @@ class SSLClientWrapper():
   def start(self, host, port, password):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     self.ssl_sock = ssl.wrap_socket(s,
-      cert_reqs=ssl.CERT_NONE)
+      ca_certs="./ssl/cert.crt",
+      cert_reqs=ssl.CERT_REQUIRED)
 
-    self.ssl_sock.connect((host, int(port)))
+    try:
+      self.ssl_sock.connect((host, int(port)))
+    except ssl.SSLError, e:
+      print "An SSL error has occurred:\n\n%s\n" % (str(e))
+      print "Please make sure the certificate for your server (server/ssl/server.crt) is placed in client/ssl/cert.crt"
+      sys.exit()
     self.ssl_sock.write(password+"\r\n")
 
   def writeln(self, line):

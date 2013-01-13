@@ -173,6 +173,8 @@ class Sniffer():
   
   def u_open(self, lport, rmac, rip, rport):
     cc, cont = geocode.lookup(rip)
+    cc = cc if cc else "LL"
+    cont = cont if cont else "--"
     self.numopen += 1
     self.new_connection_handler(1, rmac, rip, rport, cc, cont)
     self.udp_db[lport] = {
@@ -203,6 +205,8 @@ class Sniffer():
 
   def s_open(self, lport, rmac, rip, rport):
     cc, cont = geocode.lookup(rip)
+    cc = cc if cc else "LL"
+    cont = cont if cont else "--"
     self.numopen += 1
     self.new_connection_handler(1, rmac, rip, rport, cc, cont)
     self.tcp_db[lport] = {

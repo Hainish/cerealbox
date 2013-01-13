@@ -7,14 +7,15 @@ class Client():
 
   @staticmethod
   def usage():
-    print "Usage: python ./client.py HOST PORT NET_DEVICE SRC_IPADDR PASSWORD"
+    print "Usage: python ./client.py HOST PORT NET_DEVICE SRC_IPADDR PASSWORD [DNS]"
 
-  def __init__(self, host, port, net_device, src_ipaddr, password):
+  def __init__(self, host, port, net_device, src_ipaddr, password, dns):
     self.host = host
     self.port = port
     self.net_device = net_device
     self.src_ipaddr = src_ipaddr
     self.password = password
+    self.dns = dns
 
   def new_connection_handler(self, connection):
     pass
@@ -23,9 +24,19 @@ class Client():
     client = SSLClientWrapper()
     client.start(self.host, self.port, self.password)
 
+    sniffer = Sniffer()
+    sniffer.set_new_connection_handler(self.new_connection_handler)
+    sniffer.sniff(self.net_device, self.src_ipaddr, self.dns)
+
 if len(sys.argv) != 6:
   Client.usage()
   sys.exit()
 
-c = Client(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
+c = None
+
+if len(sys.argv) == 6:
+  c = Client(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], False)
+if len(sys.argv) == 7 and sys.argv[6] == "DNS":
+  c = Client(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], True)
+
 c.start()

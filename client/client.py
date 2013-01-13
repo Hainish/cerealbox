@@ -1,5 +1,5 @@
 import sys
-import inspect
+import os
 from ssl_client_wrapper import SSLClientWrapper
 from sniffer import Sniffer
 
@@ -31,6 +31,8 @@ class Client():
 if len(sys.argv) != 6:
   Client.usage()
   sys.exit()
+if not os.geteuid()==0:
+  sys.exit("root permission is required to listen on network interface.")
 
 c = None
 

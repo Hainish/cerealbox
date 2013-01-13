@@ -118,11 +118,15 @@ class Sniffer():
         self.s_close(lport)
       # if a syn,ack is received, that's a new connection
       elif syn and ack:
+        if lport in self.tcp_db:
+          if self.tcp_db[lport]['close'] == 1:
+            self.s_open(lport, rmac, rip, rport)
         self.s_open(lport, rmac, rip, rport)
       else:
         # otherwise, it's mid-stream - update time
         if lport in self.tcp_db:
-          self.tcp_db[lport]['time'] = datetime.now()
+          if self.tcp_db[lport]['close'] == 0:
+            self.tcp_db[lport]['time'] = datetime.now()
         else:
           self.s_open(lport, rmac, rip, rport)
 

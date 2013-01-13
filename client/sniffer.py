@@ -95,7 +95,10 @@ class Sniffer():
         rport = layer4.get_uh_dport()
 
       if lport in self.udp_db:
-        self.udp_db[lport]['time'] = datetime.now()
+        if self.udp_db[lport]['close'] == 0:
+          self.udp_db[lport]['time'] = datetime.now()
+        else:
+          self.u_open(lport, rmac, rip, rport)
       else:
         self.u_open(lport, rmac, rip, rport)
 
@@ -155,18 +158,19 @@ class Sniffer():
             print print_str
       print "UDP"
       for lport in self.udp_db:
-        if (now - self.udp_db[lport]['time']).total_seconds() > 20:
-          self.u_close(lport)
-        else:
-          print_arr = [
-            Sniffer.mac_to_hex(self.udp_db[lport]['rmac']),
-            Sniffer.ip_to_hex(self.udp_db[lport]['rip']),
-            Sniffer.port_to_hex(self.udp_db[lport]['rport']),
-            self.udp_db[lport]['cc'],
-            self.udp_db[lport]['cont']
-          ]
-          print_str = ",".join(print_arr)
-          print print_str
+        if self.udp_db[lport]['close'] == 0:
+          if (now - self.udp_db[lport]['time']).total_seconds() > 20:
+            self.u_close(lport)
+          else:
+            print_arr = [
+              Sniffer.mac_to_hex(self.udp_db[lport]['rmac']),
+              Sniffer.ip_to_hex(self.udp_db[lport]['rip']),
+              Sniffer.port_to_hex(self.udp_db[lport]['rport']),
+              self.udp_db[lport]['cc'],
+              self.udp_db[lport]['cont']
+            ]
+            print_str = ",".join(print_arr)
+            print print_str
     self.lasttime = now
 
 
@@ -199,7 +203,7 @@ class Sniffer():
           self.udp_db[lport]['cc'],
           self.udp_db[lport]['cont'],
       )
-      del self.udp_db[lport]
+      self.udp_db[lport]['close'] = 1
 
 
 

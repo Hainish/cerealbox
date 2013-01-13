@@ -14,6 +14,7 @@ class Sniffer():
     self.tcp_db = {}
     self.numopen = 0
     self.numclose = 0
+    self.lasttime = datetime(1900,1,1,0,0,0,0)
 
 
   def set_new_connection_handler(self, new_connection_handler):
@@ -133,8 +134,48 @@ class Sniffer():
         else:
           self.s_open(lport, rmac, rip, rport)
 
+    now = datetime.now()
+    if (now - self.lasttime).total_seconds() > 10:
+      print "Open connections:"
+      print "TCP"
+      for lport in self.tcp_db:
+        if self.tcp_db[lport]['close'] == 0:
+          if (now - self.tcp_db[lport]['time']).total_seconds() > 60:
+            print "timeout "+self.tcp_db[lport]['rip']
+            self.s_close(lport)
+          else:
+            print_arr = [
+              Sniffer.mac_to_hex(self.tcp_db[lport]['rmac']),
+              Sniffer.ip_to_hex(self.tcp_db[lport]['rip']),
+              Sniffer.port_to_hex(self.tcp_db[lport]['rport']),
+              self.tcp_db[lport]['cc'],
+              self.tcp_db[lport]['cont']
+            ]
+            print_str = ",".join(print_arr)
+            print print_str
+      print "UDP"
+      for lport in self.udp_db:
+        if (now - self.udp_db[lport]['time']).total_seconds() > 20:
+          self.u_close(lport)
+        else:
+          print_arr = [
+            Sniffer.mac_to_hex(self.udp_db[lport]['rmac']),
+            Sniffer.ip_to_hex(self.udp_db[lport]['rip']),
+            Sniffer.port_to_hex(self.udp_db[lport]['rport']),
+            self.udp_db[lport]['cc'],
+            self.udp_db[lport]['cont']
+          ]
+          print_str = ",".join(print_arr)
+          print print_str
+    self.lasttime = now
+
+
   
   def u_open(self, lport, rmac, rip, rport):
+    pass
+
+
+  def u_close(self, lport):
     pass
 
 

@@ -4,6 +4,8 @@ import impacket.ImpactPacket
 import geocode
 from datetime import datetime
 import multiprocessing
+import threading
+import time
 import sys
 
 SNAPLEN = 90
@@ -48,14 +50,56 @@ class Sniffer():
     self.loop_process = multiprocessing.Process(name='sniffing', target=self._start_sniffing)
     self.loop_process.start()
 
-    self.regular_interval()
+    self._keyboard_interrupt()
 
 
   def _start_sniffing(self):
+    t = threading.Thread(name='regular_timeout_check', target=self._regular_timeout_check)
+    t.start()
+
     self.reader.loop(-1, self.packet_received)
 
 
-  def regular_interval(self):
+  def _regular_timeout_check(self):
+    while True:
+      time.sleep(10)
+
+      now = datetime.now()
+      print "Open connections:"
+      print "TCP"
+      for lport in self.tcp_db:
+        if self.tcp_db[lport]['close'] == 0:
+          if (now - self.tcp_db[lport]['time']).total_seconds() > 60:
+            print "timeout "+self.tcp_db[lport]['rip']
+            self.s_close(lport)
+          else:
+            print_arr = [
+              Sniffer.mac_to_hex(self.tcp_db[lport]['rmac']),
+              Sniffer.ip_to_hex(self.tcp_db[lport]['rip']),
+              Sniffer.port_to_hex(self.tcp_db[lport]['rport']),
+              self.tcp_db[lport]['cc'],
+              self.tcp_db[lport]['cont']
+            ]
+            print_str = ",".join(print_arr)
+            print print_str
+      print "UDP"
+      for lport in self.udp_db:
+        if self.udp_db[lport]['close'] == 0:
+          if (now - self.udp_db[lport]['time']).total_seconds() > 20:
+            self.u_close(lport)
+          else:
+            print_arr = [
+              Sniffer.mac_to_hex(self.udp_db[lport]['rmac']),
+              Sniffer.ip_to_hex(self.udp_db[lport]['rip']),
+              Sniffer.port_to_hex(self.udp_db[lport]['rport']),
+              self.udp_db[lport]['cc'],
+              self.udp_db[lport]['cont']
+            ]
+            print_str = ",".join(print_arr)
+            print print_str
+
+
+  def _keyboard_interrupt(self):
     try:
       while True:
         pass
@@ -152,43 +196,6 @@ class Sniffer():
             self.tcp_db[lport]['time'] = datetime.now()
         else:
           self.s_open(lport, rmac, rip, rport)
-
-    now = datetime.now()
-    if (now - self.lasttime).total_seconds() > 10:
-      print "Open connections:"
-      print "TCP"
-      for lport in self.tcp_db:
-        if self.tcp_db[lport]['close'] == 0:
-          if (now - self.tcp_db[lport]['time']).total_seconds() > 60:
-            print "timeout "+self.tcp_db[lport]['rip']
-            self.s_close(lport)
-          else:
-            print_arr = [
-              Sniffer.mac_to_hex(self.tcp_db[lport]['rmac']),
-              Sniffer.ip_to_hex(self.tcp_db[lport]['rip']),
-              Sniffer.port_to_hex(self.tcp_db[lport]['rport']),
-              self.tcp_db[lport]['cc'],
-              self.tcp_db[lport]['cont']
-            ]
-            print_str = ",".join(print_arr)
-            print print_str
-      print "UDP"
-      for lport in self.udp_db:
-        if self.udp_db[lport]['close'] == 0:
-          if (now - self.udp_db[lport]['time']).total_seconds() > 20:
-            self.u_close(lport)
-          else:
-            print_arr = [
-              Sniffer.mac_to_hex(self.udp_db[lport]['rmac']),
-              Sniffer.ip_to_hex(self.udp_db[lport]['rip']),
-              Sniffer.port_to_hex(self.udp_db[lport]['rport']),
-              self.udp_db[lport]['cc'],
-              self.udp_db[lport]['cont']
-            ]
-            print_str = ",".join(print_arr)
-            print print_str
-    self.lasttime = now
-
 
   
   def u_open(self, lport, rmac, rip, rport):

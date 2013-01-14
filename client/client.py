@@ -19,7 +19,7 @@ class Client():
     self.password = password
     self.dns = dns
 
-  def new_connection_handler(self, code, rmac, rip, rport, cc, cont):
+  def new_connection_handler(self, code, lport, rmac, rip, rport, cc, cont):
     push_arr = [
       str(code),
       Sniffer.mac_to_hex(rmac),
@@ -30,7 +30,7 @@ class Client():
     ]
     push = ",".join(push_arr)
     print push,
-    print "(%s:%s)" % (rip, rport)
+    print "(%s:%s <-> %s)" % (rip, rport, lport)
     self._write_to_client(push)
 
     curr = self.sniffer.numopen - self.sniffer.numclose

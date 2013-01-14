@@ -83,7 +83,7 @@ class Sniffer():
             ]
             print_str = ",".join(print_arr)
             print print_str,
-            print "(%s:%s)" % (self.tcp_db[key]['rip'], self.tcp_db[key]['rport'])
+            print "(%s:%s <-> %s)" % (self.tcp_db[key]['rip'], self.tcp_db[key]['rport'], self.tcp_db[key]['lport'])
       print "UDP"
       for key in self.udp_db:
         if self.udp_db[key]['close'] == 0:
@@ -99,7 +99,7 @@ class Sniffer():
             ]
             print_str = ",".join(print_arr)
             print print_str,
-            print "(%s:%s)" % (self.udp_db[key]['rip'], self.udp_db[key]['rport'])
+            print "(%s:%s <-> %s)" % (self.udp_db[key]['rip'], self.udp_db[key]['rport'], self.udp_db[key]['lport'])
 
 
   # make sure ctrl-c actually interrupts sniffing process
@@ -163,9 +163,9 @@ class Sniffer():
         if self.udp_db[key]['close'] == 0:
           self.udp_db[key]['time'] = datetime.now()
         else:
-          self.u_open(key, rmac, rip, rport)
+          self.u_open(key, lport, rmac, rip, rport)
       else:
-        self.u_open(key, rmac, rip, rport)
+        self.u_open(key, lport, rmac, rip, rport)
 
     #tcp packet
     if proto_id == 6:
@@ -190,9 +190,9 @@ class Sniffer():
       elif syn and ack:
         if key in self.tcp_db:
           if self.tcp_db[key]['close'] == 1:
-            self.s_open(key, rmac, rip, rport)
+            self.s_open(key, lport, rmac, rip, rport)
         else:
-          self.s_open(key, rmac, rip, rport)
+          self.s_open(key, lport, rmac, rip, rport)
       # Otherwise see if connection exists and create if it doesn't
       # Only do this if sport hasn't been used before
       else:
@@ -201,18 +201,19 @@ class Sniffer():
           if self.tcp_db[key]['close'] == 0:
             self.tcp_db[key]['time'] = datetime.now()
         else:
-          self.s_open(key, rmac, rip, rport)
+          self.s_open(key, lport, rmac, rip, rport)
 
   
-  def u_open(self, key, rmac, rip, rport):
+  def u_open(self, key, lport, rmac, rip, rport):
     cc, cont = geocode.lookup(rip)
     cc = cc if cc else "LL"
     cont = cont if cont else "--"
     self.numopen += 1
-    self.new_connection_handler(1, rmac, rip, rport, cc, cont)
+    self.new_connection_handler(1, lport, rmac, rip, rport, cc, cont)
     self.udp_db[key] = {
         'cc': cc,
         'cont': cont,
+        'lport': lport,
         'rmac': rmac,
         'rip': rip,
         'rport': rport,
@@ -226,6 +227,7 @@ class Sniffer():
       self.numclose += 1
       self.new_connection_handler(
           2,
+          self.udp_db[key]['lport'],
           self.udp_db[key]['rmac'],
           self.udp_db[key]['rip'],
           self.udp_db[key]['rport'],
@@ -236,15 +238,16 @@ class Sniffer():
 
 
 
-  def s_open(self, key, rmac, rip, rport):
+  def s_open(self, key, lport, rmac, rip, rport):
     cc, cont = geocode.lookup(rip)
     cc = cc if cc else "LL"
     cont = cont if cont else "--"
     self.numopen += 1
-    self.new_connection_handler(1, rmac, rip, rport, cc, cont)
+    self.new_connection_handler(1, lport, rmac, rip, rport, cc, cont)
     self.tcp_db[key] = {
         'cc': cc,
         'cont': cont,
+        'lport': lport,
         'rmac': rmac,
         'rip': rip,
         'rport': rport,
@@ -259,6 +262,7 @@ class Sniffer():
         self.numclose += 1
         self.new_connection_handler(
             2,
+            self.tcp_db[key]['lport'],
             self.tcp_db[key]['rmac'],
             self.tcp_db[key]['rip'],
             self.tcp_db[key]['rport'],

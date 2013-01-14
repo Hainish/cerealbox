@@ -1,7 +1,17 @@
 # Cerealbox
 Arduino-based network monitor, by [William Budington](https://github.com/Hainish/), [original](https://github.com/SpiderLabs/cerealbox) by [Steve Ocepek](http://www.spiderlabs.com)
 
+Cerealbox visualizes network connections on an Arduino 8x8 LED matrix - one per coordinate. Each coordinate has an RGB value, so we're able to color-code connections based on the remote endpoint location.  Here's the mapping:
 
+ * Blue = Europe
+ * Orange = Asia
+ * Purple = Oceania
+ * Yellow = Africa
+ * White = South America
+ * Teal = North America
+ * Pink = Antarctica / Local
+ * Green = United States
+ * Red = Highlighted IPs
 
 ## Requirements
 This code should run on any Arduino board with 2k SRAM equipped with Colors Shield, or the all-in-one Colorduino board. Both Colorduino and Colors Shield are available from [iTead Studio](http://iteadstudio.com/). Colorduino does not include a USB port, so novices (like me) should use the Colors Shield + Arduino Uno.

@@ -3,6 +3,7 @@ import os
 from ssl_client_wrapper import SSLClientWrapper
 from sniffer import Sniffer
 from datetime import datetime
+from ssl import SSLError
 
 class Client():
 
@@ -29,9 +30,18 @@ class Client():
     ]
     push = ",".join(push_arr)
     print push
-    self.client.writeln(push)
+    self._write_to_client(push)
+
     curr = self.sniffer.numopen - self.sniffer.numclose
     print "close: %s open: %s, current: %s" % (str(self.sniffer.numclose), str(self.sniffer.numopen), str(curr))
+
+  # in case both threads are writing at the same time
+  def _write_to_client(self, push):
+    try: 
+      self.client.writeln(push)
+    except SSLError:
+      time.sleep(.1)
+      self._write_to_client(push)
 
   def start(self):
     self.client = SSLClientWrapper()

@@ -52,6 +52,7 @@ class Sniffer():
     self._keyboard_interrupt()
 
 
+  # make a new thread for regular listening of timeouts, then actually start sniffing
   def _start_sniffing(self):
     t = threading.Thread(name='regular_timeout_check', target=self._regular_timeout_check)
     t.start()
@@ -59,6 +60,7 @@ class Sniffer():
     self.reader.loop(-1, self.packet_received)
 
 
+  # check for timeouts every x seconds
   def _regular_timeout_check(self):
     while True:
       time.sleep(10)
@@ -98,6 +100,7 @@ class Sniffer():
             print print_str
 
 
+  # make sure ctrl-c actually interrupts sniffing process
   def _keyboard_interrupt(self):
     try:
       while True:

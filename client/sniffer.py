@@ -82,7 +82,8 @@ class Sniffer():
               self.tcp_db[lport]['cont']
             ]
             print_str = ",".join(print_arr)
-            print print_str
+            print print_str,
+            print "(%s:%s)" % (self.tcp_db[lport]['rip'], self.tcp_db[lport]['rport'])
       print "UDP"
       for lport in self.udp_db:
         if self.udp_db[lport]['close'] == 0:
@@ -97,7 +98,8 @@ class Sniffer():
               self.udp_db[lport]['cont']
             ]
             print_str = ",".join(print_arr)
-            print print_str
+            print print_str,
+            print "(%s:%s)" % (self.tcp_db[lport]['rip'], self.tcp_db[lport]['rport'])
 
 
   # make sure ctrl-c actually interrupts sniffing process

@@ -29,7 +29,8 @@ class Client():
       cont
     ]
     push = ",".join(push_arr)
-    print push
+    print push,
+    print "(%s:%s)" % (rip, rport)
     self._write_to_client(push)
 
     curr = self.sniffer.numopen - self.sniffer.numclose

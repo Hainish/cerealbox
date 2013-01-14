@@ -99,7 +99,7 @@ class Sniffer():
             ]
             print_str = ",".join(print_arr)
             print print_str,
-            print "(%s:%s)" % (self.tcp_db[lport]['rip'], self.tcp_db[lport]['rport'])
+            print "(%s:%s)" % (self.udp_db[lport]['rip'], self.udp_db[lport]['rport'])
 
 
   # make sure ctrl-c actually interrupts sniffing process

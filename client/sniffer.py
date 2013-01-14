@@ -19,7 +19,6 @@ class Sniffer():
     self.tcp_db = {}
     self.numopen = 0
     self.numclose = 0
-    self.lasttime = datetime(1900,1,1,0,0,0,0)
 
 
   def set_new_connection_handler(self, new_connection_handler):

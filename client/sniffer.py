@@ -1,5 +1,6 @@
 import pcapy
 import impacket.ImpactDecoder
+import impacket.ImpactPacket
 import geocode
 from datetime import datetime
 
@@ -42,10 +43,7 @@ class Sniffer():
       print "Could not filter packets. Error: %s" % (str(e))
 
     # start listening
-    try:
-      p.loop(-1, self.packet_received)
-    except Exception, e:
-      print "Could not sniff for device '%s'. Error: %s" % (net_device, str(e))
+    p.loop(-1, self.packet_received)
 
 
   def packet_received(self, hdr, data):
@@ -59,7 +57,7 @@ class Sniffer():
     # decode packet
     try:
       layer2 = self.decoder.decode(data)
-    except Exception, e:
+    except (Exception, impacket.ImpactPacket.ImpactPacketException), e:
       print "Could not decode packet: %s" % (str(e))
     try:
       src_ip = layer2.child().get_ip_src()

@@ -3,6 +3,8 @@ import impacket.ImpactDecoder
 import impacket.ImpactPacket
 import geocode
 from datetime import datetime
+import multiprocessing
+import sys
 
 SNAPLEN = 90
 PROMISC_MODE = 0
@@ -25,25 +27,41 @@ class Sniffer():
   def sniff(self, net_device, my_ipaddr, dns):
     self.my_ipaddr = my_ipaddr
 
-    p = None
+    self.reader = None
 
     # create reader object
     try:
-      p = pcapy.open_live(net_device, SNAPLEN, PROMISC_MODE, TO_MS) 
+      self.reader = pcapy.open_live(net_device, SNAPLEN, PROMISC_MODE, TO_MS) 
     except Exception, e:
       print "Could not open device '%s' for sniffing. Error: %s" % (net_device, str(e))
 
     # filter based on dns settings
     try:
       if dns:
-        p.setfilter("(tcp or udp) and host "+my_ipaddr)
+        self.reader.setfilter("(tcp or udp) and host "+my_ipaddr)
       else:
-        p.setfilter("(tcp or (udp and not port 53)) and host "+my_ipaddr)
+        self.reader.setfilter("(tcp or (udp and not port 53)) and host "+my_ipaddr)
     except Exception, e:
       print "Could not filter packets. Error: %s" % (str(e))
 
     # start listening
-    p.loop(-1, self.packet_received)
+    self.loop_process = multiprocessing.Process(name='sniffing', target=self._start_sniffing)
+    self.loop_process.start()
+
+    self.regular_interval()
+
+
+  def _start_sniffing(self):
+    self.reader.loop(-1, self.packet_received)
+
+
+  def regular_interval(self):
+    try:
+      while True:
+        pass
+    except KeyboardInterrupt:
+      self.loop_process.terminate()
+      sys.exit()
 
 
   def packet_received(self, hdr, data):

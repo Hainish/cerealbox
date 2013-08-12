@@ -7,6 +7,6 @@ server-cert:
 	echo Self-signing certificate...
 	openssl x509 -req -days 99999 -in server/ssl/server.csr -signkey server/ssl/server.key -out server/ssl/server.crt 2> /dev/null
 	echo
-	echo Your server ssl certificate has been created. The next step is to copy the certificate in server/ssl/cerver.crt to the client file client/ssl/cert.crt
+	echo Your server ssl certificate has been created. The next step is to copy the certificate in server/ssl/server.crt to the client file client/ssl/cert.crt
 	echo
 .SILENT: server-cert
